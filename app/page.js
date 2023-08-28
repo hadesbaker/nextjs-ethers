@@ -27,7 +27,7 @@ export default function Home() {
         await ethereum.request({ method: "eth_requestAccounts" });
         setIsConnected(true);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        setSigner(provider.setSigner());
+        setSigner(provider.getSigner());
       } catch(e) {
         console.log(e);
       }
@@ -140,9 +140,7 @@ export default function Home() {
   }
 
   return (
-    
-    <main className={styles.main}>
-      
+    <main className={styles.main}>     
       <div className={styles.description}>
 
         <Head>
