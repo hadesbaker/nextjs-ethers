@@ -1,94 +1,185 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import Head from 'next/head';
+import Image from 'next/image';
+import styles from './page.module.css';
+import { useEffect, useState } from "react";
+import { ethers } from "ethers";
+
+// connect to metamask
+// execute a function
 
 export default function Home() {
+
+  const [isConnected, setIsConnected] = useState(false);
+  const [hasMetamask, setHasMetamask] = useState(false);
+  const [signer, setSigner] = useState();
+
+  useEffect(() => {
+    if (typeof window.ethereum !== "undefined") {
+      setHasMetamask(true);
+    }
+  });
+
+  async function connect() {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        await ethereum.request({ method: "eth_requestAccounts" });
+        setIsConnected(true);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        setSigner(provider.setSigner());
+      } catch(e) {
+        console.log(e);
+      }
+    } else {
+      setIsConnected(false);
+    }
+  }
+
+  async function execute() {
+    if (typeof window.ethereum !== "undefined") {
+      const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+      const abi = [
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_name",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "_favoriteNumber",
+              type: "uint256",
+            },
+          ],
+          name: "addPerson",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+          ],
+          name: "nameToFavoriteNumber",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "people",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "favoriteNumber",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "retrieve",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_favoriteNumber",
+              type: "uint256",
+            },
+          ],
+          name: "store",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ];
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+      try {
+        await contract.store(888);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      console.log("Please install MetaMask");
+    }
+  }
+
   return (
+    
     <main className={styles.main}>
+      
       <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
+
+        <Head>
+          <link rel="icon" href="/favicon.ico"/>
+        </Head>
+
         <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+          Hello Developers! This is a basic NextJS & ethers application.
+          <br></br>
+          <br></br>
+          <div className={styles.author}>
+            By:
+            <a href="https://takibaker.netlify.app/">Taki Baker</a>
+          </div>
         </div>
-      </div>
 
-      <div className={styles.center}>
+        <div>
+          Click to connect your MetaMask wallet:
+          {hasMetamask ? (
+          isConnected ? (
+            "Connected! "
+          ) : (
+            <button onClick={() => connect()}>Connect</button>
+          )
+          ) : (
+            "Please install metamask"
+          )}
+          {isConnected ? <button onClick={() => execute()}>Execute</button> : ""}       
+        </div>
+
         <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+          src="/image.png"
+          width={500}
+          height={500}
+          alt="Me!"
         />
-      </div>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
       </div>
     </main>
   )
